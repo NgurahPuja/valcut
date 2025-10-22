@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View,  Image, StyleSheet, Alert } from "react-native";
+import { View,  Image, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as MediaLibrary from "expo-media-library";
@@ -13,7 +13,7 @@ export default function Index() {
   const [imageWidth, setImageWidth] = useState(0);
   const [imageHeight, setImageHeight] = useState(0);
   const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
-
+const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (!permissionResponse?.granted) {
       requestPermission();
@@ -26,25 +26,48 @@ export default function Index() {
       allowsEditing: false,
       quality: 1,
     });
+    
 
     if (!result.canceled) {
+      console.log(result.assets[0])
       const asset = result.assets[0];
       console.log("Width:", asset.width, "Height:", asset.height);
-
+      setLoading(true);
+      
+      setTimeout(() => {
       setImage(asset.uri);
       setImageWidth(asset.width || 300);
       setImageHeight(asset.height || 300);
+      setLoading(false);
+      }, 1000);
+
+
+
+      
     }
   };
 
-  const compressImage = async (uri: string) => {
-    const result = await ImageManipulator.manipulateAsync(uri, [], {
-      compress: 0.5,
-      format: ImageManipulator.SaveFormat.JPEG,
-    });
-    return result;
-  };
+const compressImage = async (uri: string) => {
+  // get the image size
+console.log("image width: ", imageWidth)
 
+  // optional: you can get real width/height using Image.getSize if needed
+
+  // set target width only if image is large
+  const actions = [];
+  if (imageWidth && imageWidth > 960) {
+    console.log("resize ")
+    actions.push({ resize: { width: 960 } });
+  }
+
+  const result = await ImageManipulator.manipulateAsync(uri, actions, {
+    compress: 0.65,
+    format: ImageManipulator.SaveFormat.JPEG,
+  });
+  console.log("result: ", result)
+
+  return result;
+};
   const onSaveImageAsync = async () => {
     if (!image) return Alert.alert("Please pick an image first!");
     try {
@@ -62,29 +85,31 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      {image && (
+      {loading && (
+  <ActivityIndicator
+    size="large"
+    color="#51c8e6ff'"
+    style={{ transform: [{ scale: 1.5 }] }}
+  />
+)}
+
+      {!loading && image && (
+        <>
           <Image
             source={{ uri: image }}
             style={styles.image}
             resizeMode="contain"
           />
-        )}
-      {!image && (
-        <Button theme="primary" label="Choose a photo" onPress={pickImage}/>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 20 }}>
+            <IconButton icon="delete" label="Delete" onPress={removeImage} />
+            <Button label="Download Compress" onPress={onSaveImageAsync} />
+          </View>
+        </>
       )}
-     
-      
-      {image && (
-       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
-        <IconButton icon="delete" label="Delete" onPress={removeImage} />
-        {/* <IconButton icon="save-alt" label="Download Compress" onPress={onSaveImageAsync} /> */}
-        <Button label="Download Compress" onPress={onSaveImageAsync} />
-      </View>
 
+      {!loading && !image && (
+        <Button theme="primary" label="Choose a photo" onPress={pickImage} />
       )}
-              
-        
-
     </View>
   );
 }
