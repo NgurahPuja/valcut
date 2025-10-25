@@ -21,6 +21,12 @@
         "foregroundImage": "./assets/icons/adaptive-icon.png",
         "monochromeImage": "./assets/icons/adaptive-icon.png"
       },
+      "splash": {
+        "dark": {
+          "image": "./assets/images/android-icon-background.png",
+          "backgroundColor": "#000000"
+        }
+      },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.pujabagus.compressFoto"
@@ -39,9 +45,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
           "dark": {
-            "image": "./assets/icons/splash-icon-dark.png",
-            "resizeMode": "contain",
-            "backgroundColor": "#ffffff"
+            "image": "./assets/images/android-icon-background.png",
+            "backgroundColor": "#000000"
           }
         }
       ]

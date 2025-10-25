@@ -6,6 +6,7 @@ import * as MediaLibrary from "expo-media-library";
 import { Dimensions } from "react-native";
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
+import { StatusBar } from 'expo-status-bar';
 const { width, height } = Dimensions.get("window");
 
 export default function Index() {
@@ -29,9 +30,7 @@ const [loading, setLoading] = useState(false);
     
 
     if (!result.canceled) {
-      console.log(result.assets[0])
       const asset = result.assets[0];
-      console.log("Width:", asset.width, "Height:", asset.height);
       setLoading(true);
       
       setTimeout(() => {
@@ -49,14 +48,12 @@ const [loading, setLoading] = useState(false);
 
 const compressImage = async (uri: string) => {
   // get the image size
-console.log("image width: ", imageWidth)
 
   // optional: you can get real width/height using Image.getSize if needed
 
   // set target width only if image is large
   const actions = [];
   if (imageWidth && imageWidth > 960) {
-    console.log("resize ")
     actions.push({ resize: { width: 960 } });
   }
 
@@ -64,7 +61,6 @@ console.log("image width: ", imageWidth)
     compress: 0.65,
     format: ImageManipulator.SaveFormat.JPEG,
   });
-  console.log("result: ", result)
 
   return result;
 };
@@ -85,6 +81,7 @@ console.log("image width: ", imageWidth)
 
   return (
     <View style={styles.container}>
+      <StatusBar style="dark" /> 
       {loading && (
   <ActivityIndicator
     size="large"
